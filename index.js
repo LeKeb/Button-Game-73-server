@@ -62,8 +62,8 @@ express()
 		}
 	})
 	
-	.post('/', (req, res) => {
-		var clicks = click();
+	.post('/', async (req, res) => {
+		var clicks = await click();
 		response = {};
 		if (clicks % 500 === 0) {
 			response.prize = 500;
