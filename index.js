@@ -20,7 +20,7 @@ express()
 		try {
 			const client = await pool.connect()
 			const result = await client.query('SELECT * FROM winners_table')
-			const winners = { 'results': (result) ? result.rows : null}
+			const winners = { 'winners': (result) ? result.rows : null}
 			res.send(winners)
 			client.release()
 		} catch (error) {
