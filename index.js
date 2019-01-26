@@ -15,6 +15,7 @@ function click() {
 			const dataFile = new BinaryFile('./data', 'r');
 			(async function(){
 				try {
+					console.log('reading from data file...');
 					await dataFile.open();
 					click.counter = await dataFile.readUInt32();
 					await dataFile.close();
@@ -25,6 +26,7 @@ function click() {
 				}
 			})();
 		} else {
+			console.log('data file was not found.');
 			click.counter = 0;
 		}
 	}
