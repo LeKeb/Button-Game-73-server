@@ -1,5 +1,3 @@
-const BinaryFile = require('binary-file');
-const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 5000;
@@ -9,47 +7,37 @@ const pool = new Pool({
   ssl: true
 });
 
-function click() {
+async function click() {
 	if (typeof click.counter == 'undefined') {
-		if (fs.existsSync('./data')) {
-			const dataFile = new BinaryFile('./data', 'r');
-			(async function(){
-				try {
-					console.log('reading from data file...');
-					await dataFile.open();
-					click.counter = await dataFile.readUInt32();
-					await dataFile.close();
-					console.log('Read data file successfully');
-				} catch (err) {
-					console.log('Error when reading data file');
-					click.counter = 0;
-				}
-			})();
-		} else {
-			console.log('data file was not found.');
+		try {
+			const client = await pool.connect();
+			const result = await client.query('SELECT * FROM clicks_table');
+			click.counter = result.rows[0].clicks;
+			client.release();
+		} catch (error) {
+			console.error(error);
 			click.counter = 0;
 		}
 	}
 	
 	const clicks = ++click.counter;
 	
-	updateDataFile(clicks);
+	updateClicksStorage(clicks);
 	
 	return clicks;
 }
 
-function updateDataFile(clicks) {
-	const dataFile = new BinaryFile('./data', 'w');
-		(async function(){
-			try {
-				await dataFile.open();
-				await dataFile.writeUInt32(clicks);
-				await dataFile.close();
-				console.log('Write data file successfully');
-			} catch (err) {
-				console.log('Error when writing data file');
-			}
-		})();
+async function updateClicksStorage(clicks) {
+	try {
+		const client = await pool.connect();
+		const result = await client.query(
+			'UPDATE clicks_table SET clicks = $1 WHERE clicks = clicks'
+			, [clicks]);
+		console.log('clicks_table updated');
+		client.release();
+	} catch (error) {
+		console.error(error);
+	}
 }
 
 express()
@@ -67,7 +55,7 @@ express()
 			res.send(winners);
 			client.release();
 		} catch (error) {
-			console.error(err);
+			console.error(error);
 			res.status(500);
 			res.send('Something went wrong when retrieving winners!');
 		}
@@ -103,7 +91,7 @@ async function updateWinners(winner) {
 		console.log('new winner inserted with id: ' + result.rows[0].id);
 		client.release();
 	} catch (error) {
-		console.error(err);
+		console.error(error);
 	}
 }
 	
