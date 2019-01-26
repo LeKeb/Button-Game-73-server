@@ -10,8 +10,8 @@ const pool = new Pool({
 
 function click() {
 	if (typeof click.counter == 'undefined') {
-		const dataFile = new BinaryFile('./data', 'r')
-		async function(){
+		const dataFile = new BinaryFile('./data', 'r');
+		(async function(){
 			try {
 				await dataFile.open()
 				click.counter = await dataFile.readUInt32()
@@ -21,7 +21,7 @@ function click() {
 				console.log('Error when reading data file')
 				click.counter = 0
 			}
-		}()
+		})()
 	}
 	const clicks = ++click.counter
 	
