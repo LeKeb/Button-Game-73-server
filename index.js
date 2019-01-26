@@ -1,4 +1,5 @@
 const BinaryFile = require('binary-file');
+const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 5000;
@@ -10,19 +11,24 @@ const pool = new Pool({
 
 function click() {
 	if (typeof click.counter == 'undefined') {
-		const dataFile = new BinaryFile('./data', 'r');
-		(async function(){
-			try {
-				await dataFile.open();
-				click.counter = await dataFile.readUInt32();
-				await dataFile.close();
-				console.log('Read data file successfully');
-			} catch (err) {
-				console.log('Error when reading data file');
-				click.counter = 0;
-			}
-		})()
+		if (fs.existsSync('./data')) {
+			const dataFile = new BinaryFile('./data', 'r');
+			(async function(){
+				try {
+					await dataFile.open();
+					click.counter = await dataFile.readUInt32();
+					await dataFile.close();
+					console.log('Read data file successfully');
+				} catch (err) {
+					console.log('Error when reading data file');
+					click.counter = 0;
+				}
+			})();
+		} else {
+			click.counter = 0;
+		}
 	}
+	
 	const clicks = ++click.counter;
 	
 	updateDataFile(clicks);
