@@ -45,7 +45,9 @@ express()
 	.use(bodyParser.json())
 	
 	.get('/', (req, res) => {
-		res.send('This is a simple button click game');
+		res.send('This is a simple button click game' +
+		'\n\nThe server code can be found here: https://github.com/LeKeb/Button-Game-73-server' +
+		'\nThe game code can be found here: https://github.com/LeKeb/Button-Game-73-client');
 	})
 	
 	.get('/winners', async (req, res) => {
