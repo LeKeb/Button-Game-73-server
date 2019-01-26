@@ -13,6 +13,7 @@ async function click() {
 			const client = await pool.connect();
 			const result = await client.query('SELECT * FROM clicks_table');
 			click.counter = result.rows[0].clicks;
+			console.log('read from clicks_table complete');
 			client.release();
 		} catch (error) {
 			console.error(error);
@@ -23,7 +24,7 @@ async function click() {
 	const clicks = ++click.counter;
 	
 	updateClicksStorage(clicks);
-	
+	console.log(clicks);
 	return clicks;
 }
 
