@@ -24,7 +24,7 @@ async function click() {
 	const clicks = ++click.counter;
 	
 	updateClicksStorage(clicks);
-	console.log(clicks);
+	
 	return clicks;
 }
 
