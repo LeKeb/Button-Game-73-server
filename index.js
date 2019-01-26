@@ -46,8 +46,8 @@ express()
 	
 	.get('/', (req, res) => {
 		res.send('This is a simple button click game' +
-		'<br><br>The server code can be found here: https://github.com/LeKeb/Button-Game-73-server' +
-		'<br>The game code can be found here: https://github.com/LeKeb/Button-Game-73-client');
+		'<br><br>The server code can be found <a href="https://github.com/LeKeb/Button-Game-73-server">here</a>.' +
+		'<br>The game code can be found <a href="https://github.com/LeKeb/Button-Game-73-client">here</a>.');
 	})
 	
 	.get('/winners', async (req, res) => {
