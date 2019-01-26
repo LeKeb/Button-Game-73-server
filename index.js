@@ -1,3 +1,4 @@
+const fs = require('binary-file')
 const express = require('express')
 const bodyParser = require('body-parser')
 const PORT = process.env.PORT || 5000
@@ -7,7 +8,41 @@ const pool = new Pool({
   ssl: true
 })
 
-var clicks = 0
+function click() {
+	if (typeof click.counter == 'undefined') {
+		const dataFile = new BinaryFile('./data', 'r')
+		(async function(){
+			try {
+				await dataFile.open()
+				click.counter = await dataFile.readUInt32()
+				await dataFile.close()
+				console.log('Read data file successfully')
+			} catch (err) {
+				console.log('Error when reading data file')
+				click.counter = 0
+			}
+		})()
+	}
+	const clicks = ++click.counter
+	
+	updateDataFile(clicks)
+	
+	return clicks
+}
+
+function updateDataFile(clicks) {
+	const dataFile = new BinaryFile('./data', 'w')
+		(async function(){
+			try {
+				await dataFile.open()
+				await dataFile.writeUInt32(clicks)
+				await dataFile.close()
+				console.log('Write data file successfully')
+			} catch (err) {
+				console.log('Error when writing data file')
+			}
+		})()
+}
 
 express()
 	.use(bodyParser.json())
@@ -31,7 +66,7 @@ express()
 	})
 	
 	.post('/', (req, res) => {
-		clicks++
+		var clicks = click()
 		response = {}
 		if (clicks % 500 === 0) {
 			response.prize = 500
@@ -54,7 +89,9 @@ express()
 async function updateWinners(winner) {
 	try {
 		const client = await pool.connect()
-		const result = await client.query('INSERT INTO winners_table (name, prize) VALUES($1, $2) RETURNING id', [winner.name, winner.prize])
+		const result = await client.query(
+			'INSERT INTO winners_table (name, prize) VALUES($1, $2) RETURNING id'
+			, [winner.name, winner.prize])
 		console.log('new winner inserted with id: ' + result.rows[0].id)
 		client.release()
 	} catch (error) {
