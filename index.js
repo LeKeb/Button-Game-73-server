@@ -1,4 +1,4 @@
-const fs = require('binary-file')
+const BinaryFile = require('binary-file')
 const express = require('express')
 const bodyParser = require('body-parser')
 const PORT = process.env.PORT || 5000
